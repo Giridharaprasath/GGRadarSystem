@@ -1,7 +1,6 @@
 // Copyright Melon Studios.
 
 #include "RadarWidget.h"
-#include "FWorldDirection.h"
 #include "GGRadarDeveloperSettings.h"
 #include "WorldDirectionWidget.h"
 #include "Components/Overlay.h"
@@ -9,11 +8,11 @@
 
 void URadarWidget::PlayRadarBlendAnim_Implementation(const bool bShowRadar)
 {
-	const EUMGSequencePlayMode::Type PlayAnimType = bShowRadar ? EUMGSequencePlayMode::Forward : EUMGSequencePlayMode::Reverse;
+	const EUMGSequencePlayMode::Type PlayAnimType = bShowRadar ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward;
 	PlayAnimation(RadarBlendAnim, 0, 1, PlayAnimType, 1.f, false);
 }
 
-void URadarWidget::AddWorldDirection(const FWorldDirection& WorldDirection)
+void URadarWidget::AddWorldDirectionInfo(const FWorldDirectionsInfo& WorldDirectionsInfo)
 {
 	if (!WorldDirectionWidgetClass)
 	{
@@ -23,7 +22,7 @@ void URadarWidget::AddWorldDirection(const FWorldDirection& WorldDirection)
 	checkf(WorldDirectionWidgetClass, TEXT("World Direction Widget Class Not Set In "), __FUNCTION__);
 	UWorldDirectionWidget* DirectionWidget = CreateWidget<UWorldDirectionWidget>(GetWorld(), WorldDirectionWidgetClass);
 
-	DirectionWidget->WorldDirectionInfo = WorldDirection;
+	DirectionWidget->WorldDirectionsInfo = WorldDirectionsInfo;
 	WorldDirectionWidgets.Add(DirectionWidget);
 
 	if (UOverlaySlot* WidgetOverlaySlot = RadarOverlay->AddChildToOverlay(DirectionWidget))

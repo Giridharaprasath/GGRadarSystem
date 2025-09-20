@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "FWorldDirection.h"
+#include "FWorldDirectionsInfo.h"
 #include "Blueprint/UserWidget.h"
 
 #include "WorldDirectionWidget.generated.h"
@@ -11,7 +11,7 @@
 class UTextBlock;
 struct FWorldDirection;
 
-/**
+/*
  *	World Direction Radar System Widget Class.
  */
 UCLASS()
@@ -22,7 +22,7 @@ class GGRADARSYSTEM_API UWorldDirectionWidget : public UUserWidget
 public:
 	virtual void NativePreConstruct() override;
 	
-	FWorldDirection WorldDirectionInfo;
+	FWorldDirectionsInfo WorldDirectionsInfo;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = "Radar|UI", meta = ( BindWidget ))

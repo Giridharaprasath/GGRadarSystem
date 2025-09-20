@@ -3,16 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Animation/WidgetAnimationEvents.h"
 #include "Components/ActorComponent.h"
 
 #include "RadarComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnProcessSignature);
-
+struct FWorldDirectionsInfo;
 struct FRotationsToTranslation;
-struct FWorldDirection;
 class URadarWidget;
 class UCameraComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnProcessSignature);
 
 /*
  *	Radar System Component Class.
@@ -46,14 +47,14 @@ private:
 	TObjectPtr<URadarWidget> RadarWidget;
 	UPROPERTY()
 	TSubclassOf<URadarWidget> RadarWidgetClass;
-	
+
 	UPROPERTY(VisibleAnywhere, Category = "Radar|Boolean")
 	bool bIsVisible;
 	UPROPERTY(VisibleAnywhere, Category = "Radar|Boolean")
 	bool bCanChangeVisibility;
 
-	UPROPERTY(VisibleAnywhere, Category = "Radar|Configurations")
-	TArray<FWorldDirection> WorldDirections;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Radar|Configurations")
+	TArray<FWorldDirectionsInfo> WorldDirectionsInfo;
 	UPROPERTY(VisibleAnywhere, Category = "Radar|Configurations")
 	float MaxWidgetTranslation;
 
@@ -61,6 +62,10 @@ private:
 
 	void AddWorldDirectionsToWidget();
 	void UpdateDirectionWidgets();
+
+	FWidgetAnimationDynamicEvent OnRadarBlendAnimFinishedDelegate;
+	UFUNCTION()
+	void OnRadarBlendAnimFinished();
 
 #pragma region Calculations
 	FRotationsToTranslation RotationsToTranslation(const FRotator& RotationA, const FRotator& RotationB) const;

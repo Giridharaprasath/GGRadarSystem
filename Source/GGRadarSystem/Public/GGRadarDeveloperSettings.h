@@ -7,11 +7,13 @@
 
 #include "GGRadarDeveloperSettings.generated.h"
 
+enum class EWorldDirection : uint8;
+struct FWorldDirectionsInfo;
 struct FWorldDirection;
 class URadarWidget;
 class UWorldDirectionWidget;
 
-/**
+/*
  *	GG Radar System Developer Settings Class.
  */
 UCLASS(Config = "GGRadarSettings", DefaultConfig, meta = (DisplayName = "GG Radar Settings"), MinimalAPI)
@@ -23,7 +25,6 @@ public:
 	UGGRadarDeveloperSettings();
 	virtual FName GetCategoryName() const override;
 	virtual FText GetSectionText() const override;
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
 	UPROPERTY(Config, EditDefaultsOnly, Category = "UI")
 	FSlateFontInfo CommonFontInfo;
@@ -36,13 +37,16 @@ public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Direction Widget")
 	bool bUse8Directions;
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Direction Widget")
-	TArray<FWorldDirection> WorldDirections;
+	TArray<FWorldDirectionsInfo> WorldDirectionsInfos;
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Direction Widget")
 	TEnumAsByte<EHorizontalAlignment> DirectionHorizontalAlignment;
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Direction Widget")
 	TEnumAsByte<EVerticalAlignment> DirectionVerticalAlignment;
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Direction Widget")
 	float MaxWidgetTranslation;
+
+	UFUNCTION(BlueprintCallable, Category = "Direction")
+	static FString GetDirectionString(const EWorldDirection WorldDirection);
 
 private:
 	void CreateWidgetDirections();

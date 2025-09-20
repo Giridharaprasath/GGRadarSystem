@@ -23,7 +23,7 @@ struct FRotationsToTranslation
 	UPROPERTY()
 	bool bIsInRadarSight;
 
-	FRotationsToTranslation(): Translation(FVector2D::ZeroVector), bIsClockwise(false), bIsInRadarSight(false)
+	FRotationsToTranslation() : Translation(FVector2D::ZeroVector), bIsClockwise(false), bIsInRadarSight(false)
 	{
 	}
 
@@ -31,6 +31,6 @@ struct FRotationsToTranslation
 	{
 		Translation.X = TranslationX;
 		this->bIsClockwise = bIsClockwise;
-		this-> bIsInRadarSight = bIsInRadarSight;
+		this->bIsInRadarSight = bIsInRadarSight;
 	}
 };

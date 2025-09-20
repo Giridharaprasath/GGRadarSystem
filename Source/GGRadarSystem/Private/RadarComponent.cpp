@@ -2,10 +2,10 @@
 
 #include "RadarComponent.h"
 #include "FRotationsToTranslation.h"
-#include "FWorldDirection.h"
 #include "GGRadarDeveloperSettings.h"
 #include "RadarWidget.h"
 #include "WorldDirectionWidget.h"
+#include "Animation/WidgetAnimation.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 
@@ -18,24 +18,23 @@ URadarComponent::URadarComponent()
 
 	const UGGRadarDeveloperSettings* RadarSettings = GetDefault<UGGRadarDeveloperSettings>();
 
-	WorldDirections.Emplace(FText::FromString("N"), 0);
-	WorldDirections.Emplace(FText::FromString("E"), 90);
-	WorldDirections.Emplace(FText::FromString("S"), 180);
-	WorldDirections.Emplace(FText::FromString("W"), 270);
-
-	if (RadarSettings->bUse8Directions)
+	for (FWorldDirectionsInfo DirectionsInfo : RadarSettings->WorldDirectionsInfos)
 	{
-		WorldDirections.Emplace(FText::FromString("NE"), 45);
-		WorldDirections.Emplace(FText::FromString("SE"), 135);
-		WorldDirections.Emplace(FText::FromString("SW"), 225);
-		WorldDirections.Emplace(FText::FromString("NW"), 315);
+		if (DirectionsInfo.bIsMainDirection)
+		{
+			WorldDirectionsInfo.Emplace(DirectionsInfo);
+		}
+		else if (RadarSettings->bUse8Directions)
+		{
+			WorldDirectionsInfo.Emplace(DirectionsInfo);
+		}
 	}
 
 	RadarWidgetClass = RadarSettings->RadarWidget.LoadSynchronous();
-
 	MaxWidgetTranslation = RadarSettings->MaxWidgetTranslation;
 
 	OnPlayerTurnedDelegate.AddDynamic(this, &ThisClass::OnPlayerTurned);
+	OnRadarBlendAnimFinishedDelegate.BindDynamic(this, &ThisClass::OnRadarBlendAnimFinished);
 }
 
 void URadarComponent::InitializeRadar(UCameraComponent* Camera, AActor* Player)
@@ -51,6 +50,8 @@ void URadarComponent::InitializeRadar(UCameraComponent* Camera, AActor* Player)
 	RadarWidget->AddToViewport(0);
 
 	OnPlayerTurnedDelegate.Broadcast();
+
+	RadarWidget->BindToAnimationFinished(RadarWidget->RadarBlendAnim, OnRadarBlendAnimFinishedDelegate);
 }
 
 void URadarComponent::ToggleRadarVisibility(const bool bCanAnimate)
@@ -78,34 +79,20 @@ void URadarComponent::SetRadarVisibility(const bool bShowRadar, const bool bCanS
 			{
 				RadarWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 			}
-			else
-			{
-				RadarWidget->SetVisibility(ESlateVisibility::Hidden);
-			}
-
-			bCanChangeVisibility = true;
+			RadarWidget->PlayRadarBlendAnim(bIsVisible);
 		}
 		else
 		{
-			if (bIsVisible)
-			{
-				RadarWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-			}
-			else
-			{
-				RadarWidget->SetVisibility(ESlateVisibility::Hidden);
-			}
-
-			bCanChangeVisibility = true;
+			OnRadarBlendAnimFinishedDelegate.ExecuteIfBound();
 		}
 	}
 }
 
 void URadarComponent::AddWorldDirectionsToWidget()
 {
-	for (FWorldDirection Direction : WorldDirections)
+	for (FWorldDirectionsInfo DirectionsInfo : WorldDirectionsInfo)
 	{
-		RadarWidget->AddWorldDirection(Direction);
+		RadarWidget->AddWorldDirectionInfo(DirectionsInfo);
 	}
 }
 
@@ -115,7 +102,7 @@ void URadarComponent::UpdateDirectionWidgets()
 
 	for (int i = 0; i < DirectionWidgets.Num(); i++)
 	{
-		const float Yaw = WorldDirections[i].WorldRotation;
+		const float Yaw = WorldDirectionsInfo[i].WorldRotation;
 
 		const FRotator RotationA = CameraReference->GetComponentRotation();
 		const FRotator RotationB = FRotator(0.f, Yaw, 0.f);
@@ -138,6 +125,20 @@ void URadarComponent::UpdateDirectionWidgets()
 			}
 		}
 	}
+}
+
+void URadarComponent::OnRadarBlendAnimFinished()
+{
+	if (bIsVisible)
+	{
+		RadarWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	}
+	else
+	{
+		RadarWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	bCanChangeVisibility = true;
 }
 
 FRotationsToTranslation URadarComponent::RotationsToTranslation(const FRotator& RotationA, const FRotator& RotationB) const

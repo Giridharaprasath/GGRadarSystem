@@ -1,8 +1,11 @@
 ﻿// Copyright Melon Studios.
 
 #include "RadarComponent.h"
+
+#include "FMarkerInfo.h"
 #include "FRotationsToTranslation.h"
 #include "GGRadarDeveloperSettings.h"
+#include "MarkerWidget.h"
 #include "RadarWidget.h"
 #include "WorldDirectionWidget.h"
 #include "Animation/WidgetAnimation.h"
@@ -124,6 +127,33 @@ void URadarComponent::UpdateDirectionWidgets()
 				DirectionWidgets[i]->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
+	}
+}
+
+void URadarComponent::AddMarkerToWidget(const FMarkerInfo& MarkerInfo)
+{
+	MarkerInfos.Add(MarkerInfo);
+
+	if (!RadarWidget) return;
+
+	RadarWidget->AddMarkerInfo(MarkerInfo.MarkerType);
+}
+
+void URadarComponent::UpdateMarkerDistances()
+{
+	const TArray<UMarkerWidget*> MarkerWidgets = RadarWidget->MarkerWidgets;
+
+	for (int i = 0; i < MarkerWidgets.Num(); i++)
+	{
+		const FMarkerInfo MarkerInfo = MarkerInfos[i];
+
+		const FVector MarkerLocation = FVector(MarkerInfo.MarkerLocation.X, MarkerInfo.MarkerLocation.Y, 0.f);
+		FVector PlayerLocation = FVector(PlayerReference->GetActorLocation());
+		PlayerLocation = FVector(PlayerLocation.X, PlayerLocation.Y, 0.f);
+
+		const float Distance = (MarkerLocation - PlayerLocation).Length() / 150.f;
+
+		MarkerWidgets[i]->UpdateMarkerDistance(FMath::RoundToInt(Distance));
 	}
 }
 

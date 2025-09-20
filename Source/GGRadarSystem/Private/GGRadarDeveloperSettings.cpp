@@ -1,8 +1,10 @@
 // Copyright Melon Studios.
 
 #include "GGRadarDeveloperSettings.h"
-#include "FWorldDirectionsInfo.h"
+#include "EMarkerTypes.h"
 #include "EWorldDirection.h"
+#include "FWorldDirectionsInfo.h"
+#include "FMarkerInfo.h"
 
 UGGRadarDeveloperSettings::UGGRadarDeveloperSettings()
 {
@@ -17,6 +19,10 @@ UGGRadarDeveloperSettings::UGGRadarDeveloperSettings()
 	DirectionHorizontalAlignment = HAlign_Center;
 	DirectionVerticalAlignment = VAlign_Bottom;
 	MaxWidgetTranslation = 320.f;
+
+	MarkerWidget = TSoftClassPtr<UMarkerWidget>(FSoftObjectPath(TEXT("/GGRadarSystem/WBP_RadarDirection.WBP_RadarMarker_C")));
+	MarkerHorizontalAlignment = HAlign_Center;
+	MarkerVerticalAlignment = VAlign_Center;
 }
 
 FName UGGRadarDeveloperSettings::GetCategoryName() const
@@ -65,4 +71,11 @@ void UGGRadarDeveloperSettings::CreateWidgetDirections()
 	WorldDirectionsInfos.Emplace(EWorldDirection::SW, 225, false);
 	WorldDirectionsInfos.Emplace(EWorldDirection::W, 270, true);
 	WorldDirectionsInfos.Emplace(EWorldDirection::NW, 315, false);
+}
+
+void UGGRadarDeveloperSettings::CreateMarkerInfos()
+{
+	MarkersInfo.Empty();
+	MarkersInfo.Emplace(EMarkerTypes::MainQuest, FVector::ZeroVector);
+	MarkersInfo.Emplace(EMarkerTypes::SideQuest, FVector::ZeroVector);
 }

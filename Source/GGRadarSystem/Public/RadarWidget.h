@@ -7,6 +7,8 @@
 
 #include "RadarWidget.generated.h"
 
+enum class EMarkerTypes : uint8;
+class UMarkerWidget;
 struct FWorldDirectionsInfo;
 class UWorldDirectionWidget;
 class UImage;
@@ -33,6 +35,10 @@ public:
 	TArray<UWorldDirectionWidget*> WorldDirectionWidgets;
 	void AddWorldDirectionInfo(const FWorldDirectionsInfo& WorldDirectionsInfo);
 
+	UPROPERTY(BlueprintReadOnly, Category = "Radar|UI")
+	TArray<UMarkerWidget*> MarkerWidgets;
+	void AddMarkerInfo(const EMarkerTypes MarkerType);
+
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "Radar", meta = ( BindWidgetAnim ))
 	TObjectPtr<UWidgetAnimation> RadarBlendAnim;
 
@@ -40,8 +46,16 @@ private:
 	UPROPERTY()
 	TSubclassOf<UWorldDirectionWidget> WorldDirectionWidgetClass;
 
-	EHorizontalAlignment HorizontalAlignment;
-	EVerticalAlignment VerticalAlignment;
+	EHorizontalAlignment DirectionHorizontalAlignment;
+	EVerticalAlignment DirectionVerticalAlignment;
 
-	void SetWidgetClass();
+	void SetWorldDirectWidgetClass();
+
+	UPROPERTY()
+	TSubclassOf<UMarkerWidget> MarkerWidgetClass;
+
+	EHorizontalAlignment MarkerHorizontalAlignment;
+	EVerticalAlignment MarkerVerticalAlignment;
+
+	void SetMarkerWidgetClass();
 };

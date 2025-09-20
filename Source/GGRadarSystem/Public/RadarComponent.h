@@ -8,6 +8,7 @@
 
 #include "RadarComponent.generated.h"
 
+struct FMarkerInfo;
 struct FWorldDirectionsInfo;
 struct FRotationsToTranslation;
 class URadarWidget;
@@ -58,11 +59,17 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Radar|Configurations")
 	float MaxWidgetTranslation;
 
+	UPROPERTY(VisibleDefaultsOnly, Category = "Radar|Markers")
+	TArray<FMarkerInfo> MarkerInfos;
+
 	void SetRadarVisibility(const bool bShowRadar, const bool bCanShowAnim);
 
 	void AddWorldDirectionsToWidget();
 	void UpdateDirectionWidgets();
 
+	void AddMarkerToWidget(const FMarkerInfo& MarkerInfo);
+	void UpdateMarkerDistances();
+	
 	FWidgetAnimationDynamicEvent OnRadarBlendAnimFinishedDelegate;
 	UFUNCTION()
 	void OnRadarBlendAnimFinished();

@@ -2,6 +2,7 @@
 
 #include "RadarWidget.h"
 #include "GGRadarDeveloperSettings.h"
+#include "MarkerWidget.h"
 #include "WorldDirectionWidget.h"
 #include "Components/Overlay.h"
 #include "Components/OverlaySlot.h"
@@ -16,7 +17,7 @@ void URadarWidget::AddWorldDirectionInfo(const FWorldDirectionsInfo& WorldDirect
 {
 	if (!WorldDirectionWidgetClass)
 	{
-		SetWidgetClass();
+		SetWorldDirectWidgetClass();
 	}
 
 	checkf(WorldDirectionWidgetClass, TEXT("World Direction Widget Class Not Set In "), __FUNCTION__);
@@ -27,15 +28,43 @@ void URadarWidget::AddWorldDirectionInfo(const FWorldDirectionsInfo& WorldDirect
 
 	if (UOverlaySlot* WidgetOverlaySlot = RadarOverlay->AddChildToOverlay(DirectionWidget))
 	{
-		WidgetOverlaySlot->SetHorizontalAlignment(HorizontalAlignment);
-		WidgetOverlaySlot->SetVerticalAlignment(VerticalAlignment);
+		WidgetOverlaySlot->SetHorizontalAlignment(DirectionHorizontalAlignment);
+		WidgetOverlaySlot->SetVerticalAlignment(DirectionVerticalAlignment);
 	}
 }
 
-void URadarWidget::SetWidgetClass()
+void URadarWidget::AddMarkerInfo(const EMarkerTypes MarkerType)
+{
+	if (!MarkerWidgetClass)
+	{
+		SetMarkerWidgetClass();
+	}
+
+	checkf(MarkerWidgetClass, TEXT("Marker Widget Class Not Set In "), __FUNCTION__);
+	UMarkerWidget* MarkerWidget = CreateWidget<UMarkerWidget>(GetWorld(), MarkerWidgetClass);
+
+	MarkerWidget->MarkerInfo.MarkerType = MarkerType;
+	MarkerWidgets.Add(MarkerWidget);
+
+	if (UOverlaySlot* WidgetOverlaySlot = RadarOverlay->AddChildToOverlay(MarkerWidget))
+	{
+		WidgetOverlaySlot->SetHorizontalAlignment(MarkerHorizontalAlignment);
+		WidgetOverlaySlot->SetVerticalAlignment(MarkerVerticalAlignment);
+	}
+}
+
+void URadarWidget::SetWorldDirectWidgetClass()
 {
 	const UGGRadarDeveloperSettings* RadarSettings = GetDefault<UGGRadarDeveloperSettings>();
 	WorldDirectionWidgetClass = RadarSettings->WorldDirectionWidget.LoadSynchronous();
-	HorizontalAlignment = RadarSettings->DirectionHorizontalAlignment;
-	VerticalAlignment = RadarSettings->DirectionVerticalAlignment;
+	DirectionHorizontalAlignment = RadarSettings->DirectionHorizontalAlignment;
+	DirectionVerticalAlignment = RadarSettings->DirectionVerticalAlignment;
+}
+
+void URadarWidget::SetMarkerWidgetClass()
+{
+	const UGGRadarDeveloperSettings* RadarSettings = GetDefault<UGGRadarDeveloperSettings>();
+	MarkerWidgetClass = RadarSettings->MarkerWidget.LoadSynchronous();
+	MarkerHorizontalAlignment = RadarSettings->MarkerHorizontalAlignment;
+	MarkerVerticalAlignment = RadarSettings->MarkerVerticalAlignment;
 }

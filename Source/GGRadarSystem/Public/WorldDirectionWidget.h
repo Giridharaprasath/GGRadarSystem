@@ -9,7 +9,6 @@
 #include "WorldDirectionWidget.generated.h"
 
 class UTextBlock;
-struct FWorldDirection;
 
 /*
  *	World Direction Radar System Widget Class.

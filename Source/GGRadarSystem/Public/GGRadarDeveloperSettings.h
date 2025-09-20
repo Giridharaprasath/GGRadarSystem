@@ -7,6 +7,8 @@
 
 #include "GGRadarDeveloperSettings.generated.h"
 
+struct FMarkerInfo;
+class UMarkerWidget;
 enum class EWorldDirection : uint8;
 struct FWorldDirectionsInfo;
 struct FWorldDirection;
@@ -45,9 +47,19 @@ public:
 	UPROPERTY(Config, EditDefaultsOnly, Category = "Direction Widget")
 	float MaxWidgetTranslation;
 
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Marker Widget")
+	TSoftClassPtr<UMarkerWidget> MarkerWidget;
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Marker Widget")
+	TArray<FMarkerInfo> MarkersInfo;
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Marker Widget")
+	TEnumAsByte<EHorizontalAlignment> MarkerHorizontalAlignment;
+	UPROPERTY(Config, EditDefaultsOnly, Category = "Marker Widget")
+	TEnumAsByte<EVerticalAlignment> MarkerVerticalAlignment;
+
 	UFUNCTION(BlueprintCallable, Category = "Direction")
 	static FString GetDirectionString(const EWorldDirection WorldDirection);
 
 private:
 	void CreateWidgetDirections();
+	void CreateMarkerInfos();
 };
